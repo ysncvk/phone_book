@@ -57,7 +57,7 @@ actor {
     return exists;
   };
 
-   public func deleteByName(searchKey: Text) : async Text {
+  public func deleteByName(searchKey: Text) : async Text {
     let filteredContact: Trie.Trie<ContactId, Contact> = Trie.filter<ContactId, Contact>(contacts, func (key: ContactId, contact: Contact)  { contact.name == searchKey});
      var size = Trie.size(filteredContact);
      if (size == 0) {
@@ -74,6 +74,22 @@ actor {
     result;
   };
 
+   public func deleteByPhone(searchKey: Text) : async Text {
+    let filteredContact: Trie.Trie<ContactId, Contact> = Trie.filter<ContactId, Contact>(contacts, func (key: ContactId, contact: Contact)  { contact.name == searchKey});
+     var size = Trie.size(filteredContact);
+     if (size == 0) {
+      return ("The number you are looking for is not in the Contact Book");
+     };
+     var contact:[(ResponseContact)] = Trie.toArray<ContactId, Contact, ResponseContact>(
+      filteredContact,
+      func(k,v): (ResponseContact) {
+        {id = k; name = v.name; phone = v.phone; email= v.email; isFavorite= v.isFavorite; isBlocked= v.isBlocked }
+      }
+     );
+     var result: Text = "Deleted Successfully";
+     if(await delete(contact[0].id)) {result := "The contact is not deleted.Try again later"};
+    result;
+  };
 
   public func getContactByName(searchKey: Text) : async Text {
 
