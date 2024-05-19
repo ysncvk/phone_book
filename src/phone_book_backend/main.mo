@@ -57,6 +57,21 @@ actor {
     return exists;
   };
 
+  public func updateContact(contactId : ContactId, contact : Contact) : async Bool {
+    let result = Trie.find(contacts, key(contactId), Nat32.equal);
+    let exists = Option.isSome(result);
+    if (exists) {
+      contacts := Trie.replace(
+        contacts,
+        key(contactId),
+        Nat32.equal,
+        ?contact,
+      ).0;
+    };
+    return exists;
+  };
+
+
   public func deleteByName(searchKey: Text) : async Text {
     let filteredContact: Trie.Trie<ContactId, Contact> = Trie.filter<ContactId, Contact>(contacts, func (key: ContactId, contact: Contact)  { contact.name == searchKey});
      var size = Trie.size(filteredContact);
