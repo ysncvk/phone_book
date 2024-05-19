@@ -15,6 +15,15 @@ actor {
         isBlocked: Bool;
     };
 
+    type ResponseContact = {
+        name: Text;
+        phone: Text;
+        email: Text;
+        isFavorite: Bool;
+        isBlocked: Bool;
+        id: Nat32;
+    };
+
    private stable var next : ContactId = 0;
 
    private stable var contacts : Trie.Trie<ContactId, Contact> = Trie.empty();
@@ -48,26 +57,44 @@ actor {
     return exists;
   };
 
-  public func getContactByName(searchKey: Text) : async Trie.Trie<ContactId, Contact> {
-
-  let filteredContact: Trie.Trie<ContactId, Contact> = Trie.filter<ContactId, Contact>(contacts, func (key: ContactId, contact: Contact)  { contact.name == searchKey});
-
-      return filteredContact;
+   public func deleteByName(searchKey: Text) : async Text {
+    let filteredContact: Trie.Trie<ContactId, Contact> = Trie.filter<ContactId, Contact>(contacts, func (key: ContactId, contact: Contact)  { contact.name == searchKey});
+     var size = Trie.size(filteredContact);
+     if (size == 0) {
+      return ("The name you are looking for is not in the Contact Book");
+     };
+     var contact:[(ResponseContact)] = Trie.toArray<ContactId, Contact, ResponseContact>(
+      filteredContact,
+      func(k,v): (ResponseContact) {
+        {id = k; name = v.name; phone = v.phone; email= v.email; isFavorite= v.isFavorite; isBlocked= v.isBlocked }
+      }
+     );
+     var result: Text = "Deleted Successfully";
+     if(await delete(contact[0].id)) {result := "The contact is not deleted.Try again later"};
+    result;
   };
 
-  public func deleteByName(name : Text) : async Text {
-        var result : ?ContactId = null;
 
-        let iter = Trie.iter(contacts);
-        for ((id, superhero) in iter) {
-            if (superhero.name == name) {
-                result := ?id;
-            };
-        };
+  public func getContactByName(searchKey: Text) : async Text {
 
-        return ("s");
+  let filteredContact: Trie.Trie<ContactId, Contact> = Trie.filter<ContactId, Contact>(contacts, func (key: ContactId, contact: Contact)  { contact.name == searchKey});
+     var size = Trie.size(filteredContact);
+     if (size == 0) {
+      return ("The name you are looking for is not in the Contact Book");
+     };
+     var contact:[(ResponseContact)] = Trie.toArray<ContactId, Contact, ResponseContact>(
+      filteredContact,
+      func(k,v): (ResponseContact) {
+        {id = k; name = v.name; phone = v.phone; email= v.email; isFavorite= v.isFavorite; isBlocked= v.isBlocked }
+      }
+     );
+     var result: Text = "\n___CONTACT:___"#contact[0].name # contact[0].phone # contact[0].email ;
+     if (contact[0].isFavorite) {result #= " Favorite"} ;
+     if (contact[0].isBlocked) {result #= " Blocked"} ;
+     result;
+  };
 
-    };
+ 
 
 
   private func key(x : ContactId) : Trie.Key<ContactId> {
