@@ -84,13 +84,13 @@ actor {
         {id = k; name = v.name; phone = v.phone; email= v.email; isFavorite= v.isFavorite; isBlocked= v.isBlocked }
       }
      );
-     var result: Text = "Deleted Successfully";
-     if(await delete(contact[0].id)) {result := "The contact is not deleted.Try again later"};
+     var result: Text = " The contact is not deleted.Try again later";
+     if(await delete(contact[0].id)) {result := "Deleted Successfully"};
     result;
   };
 
    public func deleteByPhone(searchKey: Text) : async Text {
-    let filteredContact: Trie.Trie<ContactId, Contact> = Trie.filter<ContactId, Contact>(contacts, func (key: ContactId, contact: Contact)  { contact.name == searchKey});
+    let filteredContact: Trie.Trie<ContactId, Contact> = Trie.filter<ContactId, Contact>(contacts, func (key: ContactId, contact: Contact)  { contact.phone == searchKey});
      var size = Trie.size(filteredContact);
      if (size == 0) {
       return ("The number you are looking for is not in the Contact Book");
@@ -143,9 +143,6 @@ actor {
      if (contact[0].isBlocked) {result #= " Blocked"} ;
      result;
   };
-
- 
-
 
   private func key(x : ContactId) : Trie.Key<ContactId> {
     return { hash = x; key = x };
