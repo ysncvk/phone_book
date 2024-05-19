@@ -110,6 +110,25 @@ actor {
      result;
   };
 
+  public func getContactByPhone(searchKey: Text) : async Text {
+
+  let filteredContact: Trie.Trie<ContactId, Contact> = Trie.filter<ContactId, Contact>(contacts, func (key: ContactId, contact: Contact)  { contact.name == searchKey});
+     var size = Trie.size(filteredContact);
+     if (size == 0) {
+      return ("The phone you are looking for is not in the Contact Book");
+     };
+     var contact:[(ResponseContact)] = Trie.toArray<ContactId, Contact, ResponseContact>(
+      filteredContact,
+      func(k,v): (ResponseContact) {
+        {id = k; name = v.name; phone = v.phone; email= v.email; isFavorite= v.isFavorite; isBlocked= v.isBlocked }
+      }
+     );
+     var result: Text = "\n___CONTACT:___"#contact[0].name # contact[0].phone # contact[0].email ;
+     if (contact[0].isFavorite) {result #= " Favorite"} ;
+     if (contact[0].isBlocked) {result #= " Blocked"} ;
+     result;
+  };
+
  
 
 
