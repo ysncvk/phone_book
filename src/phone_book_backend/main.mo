@@ -4,6 +4,7 @@ import Nat32 "mo:base/Nat32";
 import Bool "mo:base/Bool";
 import Option "mo:base/Option";
 
+
 actor {
 
     type ContactId = Nat32;
@@ -32,7 +33,7 @@ actor {
     if (not validatePhoneNumber(contact.phone)) {
             return ("Phone number must be a 10-digit");
         };
-    if (contact.isBlocked == contact.isFavorite) {
+    if (contact.isBlocked == true and contact.isFavorite == true) {
             return ("A contact cannot be both marked as a favorite and blocked. ");
         };
 
@@ -73,6 +74,24 @@ actor {
       ).0;
     };
     return exists;
+  };
+
+  public func getContacts () : async [(ResponseContact)]  {
+    return Trie.toArray<ContactId, Contact, ResponseContact>(
+    contacts,
+    func (k, v) : (ResponseContact) {
+      {id= k; name = v.name; phone = v.phone; email= v.email; isFavorite= v.isFavorite; isBlocked= v.isBlocked}
+    }
+  );
+  };
+
+  public  func showContacts(): async Text {
+    var allContacts =  await getContacts();
+    var output: Text = "\n__ALL-CONTACTS_____";
+    for (contact in allContacts.vals()){
+      output#= "\n" # contact.name
+    };
+    output;
   };
 
 
@@ -124,12 +143,13 @@ actor {
       }
      );
      var result: Text = "\n___CONTACT:___" 
+     # "\nid: " #Nat32.toText(contact[0].id)  
      # "\nName:  " #contact[0].name  
      # "\nPhone: " #contact[0].phone  
      # "\nEmail: " # contact[0].email 
      # "\n";
-     if (contact[0].isFavorite) {result #= " Favorite"} ;
-     if (contact[0].isBlocked) {result #= " Blocked"} ;
+     if (contact[0].isFavorite) {result #= " Favorite\n"} ;
+     if (contact[0].isBlocked) {result #= " Blocked\n"} ;
      result;
   };
 
