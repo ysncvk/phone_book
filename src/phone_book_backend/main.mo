@@ -105,7 +105,7 @@ actor {
         {id = k; name = v.name; phone = v.phone; email= v.email; isFavorite= v.isFavorite; isBlocked= v.isBlocked }
       }
      );
-     var result: Text = "Deleted Successfully";
+     var result: Text = "Contact" # contact[0].name #"Deleted Successfully";
      if(await delete(contact[0].id)) {result := "The contact is not deleted.Try again later"};
     result;
   };
