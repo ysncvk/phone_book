@@ -123,7 +123,11 @@ actor {
         {id = k; name = v.name; phone = v.phone; email= v.email; isFavorite= v.isFavorite; isBlocked= v.isBlocked }
       }
      );
-     var result: Text = "\n___CONTACT:___"#contact[0].name # contact[0].phone # contact[0].email ;
+     var result: Text = "\n___CONTACT:___" 
+     # "\nName:  " #contact[0].name  
+     # "\nPhone: " #contact[0].phone  
+     # "\nEmail: " # contact[0].email 
+     # "\n";
      if (contact[0].isFavorite) {result #= " Favorite"} ;
      if (contact[0].isBlocked) {result #= " Blocked"} ;
      result;
